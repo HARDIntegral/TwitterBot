@@ -1,21 +1,15 @@
 use std::io::prelude::*;
-use std::fs::File;
+use std::env;
 mod events;
 use events::Handler;
 use serenity::client::Client;
-
+use serenity::prelude::GatewayIntents;
 
 #[tokio::main]
 async fn main() {
-    // Getting token from private file
-    let mut file = File::open("token.txt").expect("Unable to open token file");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Unable to read token from file");
-    let token: &str = &*contents;
-    
-    // Starting the bot
-    let mut client = Client::builder(&token).event_handler(Handler).await
-        .expect("Error crating client");
+    let token = env::var("DISCORD_TOKEN").expect("token");
+    let mut client = Client::builder(token, GatewayIntents::empty()).event_handler(Handler).await
+        .expect("Error creating client");
     if let Err(err) = client.start().await {
         println!("Client error: {:?}", err);
     }
