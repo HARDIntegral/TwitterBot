@@ -36,13 +36,15 @@ impl EventHandler for Handler {
             let msg_content: String = msg.content.clone();
             msg.delete(&context).await;
             let rand_id: i32 = rand::thread_rng().gen_range(100000,999999);
-            let return_msg = MessageBuilder::new()
+            let mut return_msg = MessageBuilder::new()
                 .push("[")
                 .push(&rand_id)
                 .push("] ")
                 .push(msg_content)
                 .build();
-            
+            for i in &msg.attachments {
+                ChannelId(CHANNEL_ID).say(&context.http, &i.url).await;
+            }
             if let Err(err) = ChannelId(CHANNEL_ID).say(&context.http, &return_msg).await {
                 println!("Error sending message: {:?}", err);
                 return;
